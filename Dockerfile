@@ -4,7 +4,13 @@
 #
 # Copyright (C) 2020 Allan Young
 
-FROM php:7.4.2-apache
+#
+# The line below states we will base our new image on the Official PHP 7.4 
+FROM php:7.4-apache
+
+#
+# Identify the maintainer of an image
+LABEL maintainer="valfrid@gmail.com"
 
 RUN apt-get update && apt-get -y install \
        libfreetype6-dev \
@@ -33,6 +39,5 @@ COPY web/ianseo.conf /etc/apache2/conf-available/
 COPY web/php.ini /usr/local/etc/php/
 COPY web/web_prep.sh /tmp
 COPY web/phpinfo.php /tmp
-COPY Ianseo_20190701.zip /tmp
 
 RUN /tmp/web_prep.sh

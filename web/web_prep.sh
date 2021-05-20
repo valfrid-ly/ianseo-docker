@@ -11,16 +11,34 @@
 # container and be served up by that container's apache instance.
 # Essentially we:
 #
-# 1. Clear/create a www directory to hold the web server's content.
-# 2. Extract the files from the Ianseo zip file into that directory
-# 3. Tweak the Install/index.php file to simplify the initial
+# 1. Download IANSEO most recent release.
+# 2. Clear/create a www directory to hold the web server's content.
+# 3. Extract the files from the Ianseo zip file into that directory
+# 4. Tweak the Install/index.php file to simplify the initial
 #    configuration.
-# 4. Set ownership and access for the ianseo files.
-# 5. Remove the the ianseo/Common/config.inc.php file so we'll get the
+# 5. Set ownership and access for the ianseo files.
+# 6. Remove the the ianseo/Common/config.inc.php file so we'll get the
 #    initial configuration page(s) when we first connect to the
 #    server.
-# 6. Delete the zip Ianseo file to save space.
-IANSEO_ZIP=/tmp/Ianseo_20190701.zip
+# 7. Delete the zip Ianseo file to save space.
+
+RELEASES=releases.txt
+LAST_RELEASE=""
+URL=https://www.ianseo.net/Release/
+
+#
+# Obtain all releases from IANSEO and sort them
+curl https://www.ianseo.net/Release/ | grep -oP '<a href="Ianseo.+?zip">\K.+?(?=<)' | sort > $RELEASES
+#
+#Loop to get the last one
+while read -r line || [[ -n $line ]]; do LAST_RELEASE=$(echo $line | sed -e 's/\r//g' -e 's/\r//g'); done <$RELEASES
+LAST_RELEASE=${LAST_RELEASE//[$'\t\r\n']} #&& 
+
+rm -f $RELEASES
+
+curl $URL$LAST_RELEASE -o /tmp/$LAST_RELEASE
+
+IANSEO_ZIP=/tmp/$LAST_RELEASE
 INSTALL_DIR=/var/www/html/ianseo
 INDEX_PHP=$INSTALL_DIR/Install/index.php
 
